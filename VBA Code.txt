@@ -1,0 +1,121 @@
+Sub MultipleYearStockData():
+
+    For Each x In Worksheets
+    
+        Dim WorksheetName As String
+        Dim i As Long
+        Dim j As Long
+        Dim TickCount As Long
+        Dim LastRowA As Long
+        Dim LastRowI As Long
+        Dim PerChange As Double
+        Dim GreatIncr As Double
+        Dim GreatDecr As Double
+        Dim GreatVol As Double
+        
+        WorksheetName = x.Name
+        
+        x.Cells(1, 9).Value = "Ticker"
+        x.Cells(1, 10).Value = "Yearly Change"
+        x.Cells(1, 11).Value = "Percent Change"
+        x.Cells(1, 12).Value = "Total Stock Volume"
+        x.Cells(1, 16).Value = "Ticker"
+        x.Cells(1, 17).Value = "Value"
+        x.Cells(2, 15).Value = "Greatest % Increase"
+        x.Cells(3, 15).Value = "Greatest % Decrease"
+        x.Cells(4, 15).Value = "Greatest Total Volume"
+        
+        TickCount = 2
+        
+        j = 2
+        
+        LastRowA = x.Cells(Rows.Count, 1).End(xlUp).Row
+        
+            For i = 2 To LastRowA
+            
+                If x.Cells(i + 1, 1).Value <> x.Cells(i, 1).Value Then
+                
+                x.Cells(TickCount, 9).Value = x.Cells(i, 1).Value
+                
+                x.Cells(TickCount, 10).Value = x.Cells(i, 6).Value - x.Cells(j, 3).Value
+                
+                    If x.Cells(TickCount, 10).Value < 0 Then
+                
+                    x.Cells(TickCount, 10).Interior.ColorIndex = 3
+                
+                    Else
+                
+                    x.Cells(TickCount, 10).Interior.ColorIndex = 4
+                
+                    End If
+                    
+                    If x.Cells(j, 3).Value <> 0 Then
+                    PerChange = ((x.Cells(i, 6).Value - x.Cells(j, 3).Value) / x.Cells(j, 3).Value)
+                    
+                    x.Cells(TickCount, 11).Value = Format(PerChange, "Percent")
+                    
+                    Else
+                    
+                    x.Cells(TickCount, 11).Value = Format(0, "Percent")
+                    
+                    End If
+                    
+                x.Cells(TickCount, 12).Value = WorksheetFunction.Sum(Range(x.Cells(j, 7), x.Cells(i, 7)))
+                
+                TickCount = TickCount + 1
+                
+                j = i + 1
+                
+                End If
+            
+            Next i
+            
+        LastRowI = x.Cells(Rows.Count, 9).End(xlUp).Row
+        
+        GreatVolume = x.Cells(2, 12).Value
+        GreatIncrease = x.Cells(2, 11).Value
+        GreatDecrease = x.Cells(2, 11).Value
+        
+            For i = 2 To LastRowI
+            
+                If x.Cells(i, 12).Value >  GreatVolume Then
+                GreatVolume = x.Cells(i, 12).Value
+                x.Cells(4, 16).Value = x.Cells(i, 9).Value
+                
+                Else
+                
+                 GreatVolume =  GreatVolume
+                
+                End If
+                
+                If x.Cells(i, 11).Value > GreatIncrease Then
+                GreatIncrease = x.Cells(i, 11).Value
+                x.Cells(2, 16).Value = x.Cells(i, 9).Value
+                
+                Else
+                
+                GreatIncrease = GreatIncrease
+                
+                End If
+                
+                If x.Cells(i, 11).Value < GreatDecrease Then
+                GreatDecrease = x.Cells(i, 11).Value
+                x.Cells(3, 16).Value = x.Cells(i, 9).Value
+                
+                Else
+                
+                GreatDecrease = GreatDecrease
+                
+                End If
+                
+            x.Cells(2, 17).Value = Format(GreatIncrease, "Percent")
+            x.Cells(3, 17).Value = Format(GreatDecrease, "Percent")
+            x.Cells(4, 17).Value = Format(GreatVolume, "Scientific")
+            
+            Next i
+            
+        Worksheets(WorksheetName).Columns("A:Z").AutoFit
+            
+    Next x
+        
+End Sub
